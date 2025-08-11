@@ -4,7 +4,7 @@ Perform static code analysis on any Java GitHub repository using PMD.
 
 ### How to use
 
-1. clone repository
+1. Clone repository
 
 ```shell
 git clone https://github.com/mrbonk97/pmd-github-analyzer.git
@@ -30,9 +30,13 @@ gradlew.bat shadowJar
 java -jar build/libs/analyzer-1.0-all.jar --url <REPO_URL>
 ```
 
-### Args
+### Analysis Report
 
-| prop            | default                                      | required | description                                                     |
+Static analysis results for each commit are saved in the path specified by `--report-file`, including a summary file named `summarize.json`.
+
+### Options
+
+| option          | default                                      | required | description                                                     |
 | :-------------- | :------------------------------------------- | :------- | :-------------------------------------------------------------- |
 | `--url`         | null                                         | O        | GitHub repository URL                                           |
 | `--rulesets`    | `rulesets/java/quickstart.xml`               | X        | PMD ruleset configuration file                                  |
