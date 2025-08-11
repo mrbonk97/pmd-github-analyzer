@@ -29,6 +29,7 @@ public class PmdService {
         }
     }
 
+
     public void summarize(List<String> commits, String reportDir) throws IOException {
         if (commits == null || commits.isEmpty()) {
             throw new RuntimeException("commit list is empty");
@@ -41,16 +42,19 @@ public class PmdService {
         ObjectMapper mapper = new ObjectMapper();
 
         System.out.println("Summarizing commits...");
-        // 1. <reportDir>/<commits>.json 을 순회하며 연산
+
+        // Iterate over each commit's PMD report JSON file to aggregate data
         for (String oid : commits) {
             String fileName = oid + ".json";
             Path path = Paths.get(reportDir, fileName);
 
+            // Skip if the report file does not exist
             if (!Files.exists(path)) {
                 continue;
             }
 
 
+            // Read the JSON report file
             JsonNode root = mapper.readTree(path.toFile());
             JsonNode files = root.get("files");
 
@@ -61,6 +65,7 @@ public class PmdService {
 
             fileCount += files.size();
 
+            // Iterate violations array to count violations
             for (JsonNode fileNode : files) {
                 JsonNode violations = fileNode.get("violations");
                 if (violations != null && violations.isArray()) {
@@ -100,6 +105,5 @@ public class PmdService {
 
         mapper.writerWithDefaultPrettyPrinter().writeValue(Paths.get(reportDir, "summarize.json").toFile(), rootNode);
         System.out.printf("Summary saved to: %s/summarize.json\n", reportDir);
-
     }
 }

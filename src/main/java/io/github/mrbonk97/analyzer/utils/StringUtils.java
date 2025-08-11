@@ -22,7 +22,7 @@ public class StringUtils {
         return arr[arr.length - 1];
     }
 
-    public static String[] getArguments(String[] args) {
+    public static String[] getOptions(String[] args) {
         String[] arr = {DEFAULT_REPO_URL, DEFAULT_RULESETS, DEFAULT_REPORT_DIR, DEFAULT_MAX_THREAD};
 
 

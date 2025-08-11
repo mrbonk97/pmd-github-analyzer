@@ -10,6 +10,7 @@ public class GithubService {
         isGitInstalled();
     }
 
+
     public void isGitInstalled() throws InterruptedException {
         String[] command = {"git", "--version"};
         try {
@@ -18,6 +19,7 @@ public class GithubService {
             throw new RuntimeException("Git is not installed");
         }
     }
+
 
     public void cloneRepository(String url) throws IOException, InterruptedException {
         try {
@@ -39,10 +41,12 @@ public class GithubService {
         CommandUtils.runCommand(command);
     }
 
+
     public void removeWorkingTree(String oid, String repo) throws IOException, InterruptedException {
         String[] command = {"git", String.format("--git-dir=%s", repo), "worktree", "remove", oid, "--force"};
         CommandUtils.runCommand(command);
     }
+
 
     public List<String> getCommits(String repo) throws IOException, InterruptedException {
         System.out.println("Getting commits");
