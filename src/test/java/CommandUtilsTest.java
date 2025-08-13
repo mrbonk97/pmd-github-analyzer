@@ -38,6 +38,6 @@ public class CommandUtilsTest {
 
         List<String> output = CommandUtils.runCommandAndGetOutput(command);
         assertFalse(output.isEmpty());
-        assertEquals("hello", output.getFirst());
+        assertEquals("hello", output.get(0));
     }
 }
