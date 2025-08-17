@@ -75,7 +75,7 @@ java -jar build/libs/analyzer-1.0-all.jar --url <REPO_URL>
 ## Analysis Report
 
 - Static analysis results are saved in the directory specified by `--report-file`.
-- Each commit generates a JSON file, and a **summary** file named `summarize.json` is created.
+- Each commit generates a JSON file, and a **summary** file named `summary.json` is created.
 
 ---
 
