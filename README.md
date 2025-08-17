@@ -17,6 +17,13 @@ Perform **static code analysis** on any Java GitHub repository using **PMD**.
 
 ### 1. Using Docker
 
+**Clone repository**
+
+```bash
+git clone https://github.com/mrbonk97/pmd-github-analyzer.git
+cd pmd-github-analyzer
+```
+
 **Build Docker Image**
 
 ```bash
