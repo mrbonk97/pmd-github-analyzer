@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandUtils {
-    public static void runCommand(String[] command) throws IOException, InterruptedException {
+    public static void runCommand(String[] command) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.redirectErrorStream(true);
         Process p = pb.start();
@@ -17,11 +17,16 @@ public class CommandUtils {
             }
         }
 
-        p.waitFor();
+        try {
+            p.waitFor();
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted");
+        }
+
     }
 
 
-    public static List<String> runCommandAndGetOutput(String[] command) throws IOException, InterruptedException {
+    public static List<String> runCommandAndGetOutput(String[] command) throws IOException {
         List<String> output = new ArrayList<>();
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.redirectErrorStream(true);
@@ -34,7 +39,12 @@ public class CommandUtils {
             }
         }
 
-        p.waitFor();
+        try {
+            p.waitFor();
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted");
+        }
+
         return output;
     }
 }

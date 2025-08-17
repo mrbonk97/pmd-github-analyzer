@@ -1,41 +1,62 @@
 package io.github.mrbonk97.analyzer;
 
+import io.github.mrbonk97.analyzer.exception.CustomException;
 import io.github.mrbonk97.analyzer.service.GithubService;
 import io.github.mrbonk97.analyzer.service.PmdService;
-import io.github.mrbonk97.analyzer.utils.FileUtils;
 import io.github.mrbonk97.analyzer.utils.StringUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws IOException, InterruptedException {
-        String[] options = StringUtils.getOptions(args);
-        String githubRepo = options[0];
-        String rulesets = options[1];
-        String reportDir = options[2];
-        String repoName = StringUtils.getRepoNameFromUrl(options[0]);
-        int maxThreads = Integer.parseInt(options[3]);
+
+    public static void main(String[] args) {
+        try {
+            AnalyzerOptions analyzerOptions = new AnalyzerOptions(args);
+            GithubService githubService = new GithubService();
+            PmdService pmdService = new PmdService(analyzerOptions.rulesets, analyzerOptions.maxThread);
+
+            String repoName = StringUtils.getRepoNameFromUrl(analyzerOptions.url);
+
+            System.out.println("Cloning Repository: " + repoName);
+            githubService.cloneRepository(analyzerOptions.url);
+
+            System.out.println("Fetching all commits");
+            List<String> commits = githubService.getCommits(repoName);
 
 
-        GithubService githubService = new GithubService();
-        PmdService pmdService = new PmdService();
+            // Analyze each commit
+            long start = System.nanoTime();
+
+            for (int i = 0; i < commits.size(); i++) {
+                long commitStart = System.nanoTime();
+                System.out.printf("Analyzing commit %d/%d\n", i + 1, commits.size());
+                githubService.addWorkingTree(commits.get(i), repoName);
+                pmdService.analyze(analyzerOptions.reportFile, commits.get(i));
+                githubService.removeWorkingTree(commits.get(i), repoName);
+                long commitEnd = System.nanoTime();
+                double commitTimeSec = (commitEnd - commitStart) / 1_000_000_000.0;
+                System.out.printf("Commit %s analyzed in %.3f seconds\n", commits.get(i), commitTimeSec);
+            }
+
+            long end = System.nanoTime();
+            double totalTimeSec = (end - start) / 1_000_000_000.0;
+            double avgTimeSec = totalTimeSec / commits.size();
 
 
-        githubService.cloneRepository(githubRepo);
-        List<String> commits = githubService.getCommits(repoName);
+            System.out.println("Deleting temporary files");
+            pmdService.deleteCacheFile();
+            System.out.println("Summarizing Analysis");
+            pmdService.summarize(analyzerOptions.url, analyzerOptions.reportFile);
 
 
-        // Analyze each commit
-        for (int i = 0; i < commits.size(); i++) {
-            System.out.printf("Analyzing commit %d/%d\n", i + 1, commits.size());
-            githubService.addWorkingTree(commits.get(i), repoName);
-            pmdService.analyze(rulesets, reportDir, commits.get(i), maxThreads);
-            githubService.removeWorkingTree(commits.get(i), repoName);
+            System.out.println("======================================");
+            System.out.printf("Total analysis time: %.3f seconds\n", totalTimeSec);
+            System.out.printf("Average per commit: %.3f seconds\n", avgTimeSec);
+            System.out.println("======================================");
+        } catch (CustomException e) {
+            System.out.println("ERROR: " + e.getMessage());
         }
 
 
-        FileUtils.deleteFile("", "cache_pmd");
-        pmdService.summarize(commits, reportDir);
     }
 }
